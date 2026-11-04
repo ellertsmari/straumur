@@ -1,0 +1,47 @@
+# Sækir nýjustu myndbönd af YouTube-rásum kennara á hverri nóttu og uppfærir data/kennarar.js.
+# Ef eitthvað breyttist er því „commit-að“ og vefurinn endurbirtist (t.d. á Vercel).
+# Hægt er að keyra handvirkt: Actions → „Uppfæra myndbönd“ → Run workflow.
+name: Uppfæra myndbönd
+
+on:
+  schedule:
+    - cron: "17 4 * * *" # kl. 04:17 UTC = 04:17 á Íslandi
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: uppfaera-myndbond
+  cancel-in-progress: false
+
+jobs:
+  uppfaera:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Nýjasta yt-dlp í hvert sinn: YouTube breytist oft og eldri útgáfur hætta að virka
+      - name: Setja upp yt-dlp
+        run: pip install --upgrade yt-dlp
+
+      - name: Sækja myndbönd af YouTube
+        shell: bash # -o pipefail: svo villa í skriftunni stöðvi keyrsluna þrátt fyrir tee
+        run: python3 skriftur/uppfaera_youtube.py | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Vista breytingar
+        run: |
+          if git diff --quiet; then
+            echo "Engar breytingar." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add data/kennarar.js
+          git commit -m "Uppfæra myndbönd af YouTube"
+          git push
