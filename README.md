@@ -28,3 +28,6 @@ Bættu nýjum hlut í `reitir` í `data/kennarar.js`:
 - `takn` er íkoninn: `rafmagn`, `suda`, `mur`, `kayak` eða `myndband`. Nýjum íkonum má bæta við í `TAKN` í `app.js`.
 - `slod` er hvert reiturinn vísar: YouTube-rás, spilunarlisti eða skrá eins og `myndbond/jona/x.mp4`.
   Reitur án `slod` verður grár og merktur „Væntanlegt“. Þegar myndböndin koma þarf bara að bæta `slod` við.
+
+Eftir breytingu á `style.css`, `app.js` eða `data/kennarar.js`: hækkaðu `?v=` í `index.html`
+(t.d. `?v=2` → `?v=3`) svo vafrar sæki nýju skrárnar í stað gamalla úr skyndiminni.
