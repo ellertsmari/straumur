@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Straumur – myndbandasafn</title>
-<meta name="description" content="Kennslumyndbönd í rafmagni og rafeindatækni frá kennurum – flokkuð og leitanleg.">
+<meta name="description" content="Kennslumyndbönd frá kennurum – veldu fag og kennara og horfðu á öll myndböndin.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,11 +16,11 @@
   <div class="haus-innri">
     <a class="merki" href="#" data-heim aria-label="Straumur – forsíða">
       <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17"/><path d="M8 20c3.5-10 8.5-10 12 0s8.5 10 12 0"/></svg>
-      <span><strong>Straumur</strong><small>Myndbandasafn fyrir rafmagnsnema</small></span>
+      <span><strong>Straumur</strong><small>Kennslumyndbönd</small></span>
     </a>
     <div class="leit">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
-      <input id="leit" type="search" placeholder="Leita, t.d. díóða, fasvik, Ohm, mótor…" autocomplete="off" aria-label="Leita að myndbandi">
+      <input id="leit" type="search" placeholder="Leita í öllum myndböndum…" autocomplete="off" aria-label="Leita að myndbandi">
       <kbd title="Ýttu á / til að leita">/</kbd>
       <button type="button" id="leit-hreinsa" class="leit-x" hidden aria-label="Hreinsa leit">✕</button>
     </div>
@@ -29,12 +29,9 @@
 </header>
 
 <main class="efni">
-  <section aria-labelledby="kennarar-h">
-    <h2 id="kennarar-h" class="yfir">Kennarar</h2>
-    <div id="kennarar" class="moppur"></div>
-  </section>
+  <div id="toppur"></div>
 
-  <section class="siur" aria-label="Síur">
+  <section class="siur" aria-label="Síur" hidden>
     <div id="flokkar" class="flogar" role="group" aria-label="Efnisflokkar"></div>
     <div class="siur-rod">
       <label>Lengd

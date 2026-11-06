@@ -2,6 +2,9 @@
 // Til að bæta við kennara: bættu nýjum hlut aftast í listann "kennarar" (sjá README.md).
 // Myndband á YouTube:   { "id": "<YouTube-auðkenni>", "title": "Heiti", "sek": <lengd í sekúndum> }
 // Myndband sem skrá:    { "skra": "myndbond/<kennari>/<skra>.mp4", "mynd": "<smámynd>.jpg", "title": "Heiti", "sek": 490 }
+// Kennari: "fag" er stóra heitið á reitnum á forsíðunni, "takn" er íkoninn (rafmagn, suda, mur, kayak, myndband).
+// "vaentanlegt" eru gráir reitir á forsíðunni fyrir fög sem fá myndbönd seinna; færðu fagið í "kennarar" þegar þau koma.
+// "tillogur" eru „Vinsælar leitir“ fyrir hvert fag.
 // Flokkar (flokkur): grunnur = Grunnatriði rafmagns, rid = Riðstraumur og fasvik, rafeind = Rafeindatækni, motor = Mótorar og stýringar, verk = Verkefni og verklegt, teams = Teams-upptökur, lagnir = Raflagnir og dreifikerfi, annad = Annað
 window.STRAUMUR = {
  "flokkar": {
@@ -14,10 +17,24 @@ window.STRAUMUR = {
   "lagnir": "Raflagnir og dreifikerfi",
   "annad": "Annað"
  },
+ "tillogur": {
+  "Rafmagn": [
+   "Ohm",
+   "Díóður",
+   "Þéttir",
+   "Fasvik",
+   "Transistor",
+   "Mótor",
+   "Segulliði",
+   "Síur"
+  ]
+ },
  "kennarar": [
   {
    "id": "sigurdur",
    "nafn": "Sigurður Rúnar Ívarsson",
+   "fag": "Rafmagn",
+   "takn": "rafmagn",
    "lysing": "Kennari í rafmagni við Raftækniskólann í Tækniskólanum",
    "youtube": "https://www.youtube.com/@sigururrunarivarsson657",
    "listar": [
@@ -1756,6 +1773,8 @@ window.STRAUMUR = {
   {
    "id": "orri",
    "nafn": "Orri Torfason",
+   "fag": "Rafmagn",
+   "takn": "rafmagn",
    "lysing": "Kennari á Akureyri",
    "listar": [
     {
@@ -1773,6 +1792,20 @@ window.STRAUMUR = {
      ]
     }
    ]
+  }
+ ],
+ "vaentanlegt": [
+  {
+   "fag": "Málmsuða",
+   "takn": "suda"
+  },
+  {
+   "fag": "Múrviðgerðir",
+   "takn": "mur"
+  },
+  {
+   "fag": "Kayak",
+   "takn": "kayak"
   }
  ]
 };

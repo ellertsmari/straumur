@@ -16,7 +16,6 @@
   const myndbond = [];
   kennarar.forEach((k, i) => {
     k.litur = LITIR[i % LITIR.length];
-    k.upph = k.nafn.split(/\s+/).filter(Boolean).map((o) => o[0]).filter((_, j, a) => j === 0 || j === a.length - 1).join("");
     k.listar.forEach((l) => {
       l.kennari = k;
       l.lykill = k.id + "~" + l.id;
@@ -33,6 +32,19 @@
     });
   });
   const listiEftirLykli = new Map(listar.map((l) => [l.lykill, l]));
+  const vaentanlegt = D.vaentanlegt || [];
+  const TILLOGUR = D.tillogur || {};
+  const fjoldiKennara = (k) => k.listar.reduce((s, l) => s + l.myndbond.length, 0);
+
+  // Íkonar fyrir reitina á forsíðunni ("takn" í data/kennarar.js)
+  const TAKN = {
+    rafmagn: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
+    suda: '<path d="M3 21l8-8"/><path d="m9.5 11.5 3 3 4-4-3-3z"/><path d="M19 3v2.5M21.5 6H19M20.5 3.5l-1.5 1.5M16 3l.6 1.6M21 9l-1.6-.6"/>',
+    mur: '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 9.7h18M3 14.3h18M9 5v4.7M15 5v4.7M6 9.7v4.6M12 9.7v4.6M18 9.7v4.6M9 14.3V19M15 14.3V19"/>',
+    kayak: '<path d="M2 15.5c4.5 2.7 15.5 2.7 20 0-4.5-2.2-15.5-2.2-20 0z"/><path d="M6.5 6.5l11 11"/><path d="M3.5 4.8 5 3.3l3 3-1.5 1.5zM16 17.7l1.5-1.5 3 3-1.5 1.5z"/>',
+    myndband: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/>',
+  };
+  const takn = (nafn) => `<svg viewBox="0 0 24 24" aria-hidden="true">${TAKN[nafn] || TAKN.myndband}</svg>`;
 
   /* ---------- hjálparföll ---------- */
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -117,22 +129,49 @@
   }
 
   /* ---------- teikning ---------- */
-  function teiknaKennara() {
-    const heild = myndbond.length;
-    const mappa = (id, nafn, lysing, fjoldi, litur, upph, texti = "#fff") => `
-      <button class="mappa" data-k="${esc(id)}" aria-pressed="${st.k === id}" style="--litur:${litur};--upph-texti:${texti}">
-        <span class="upph" aria-hidden="true">${esc(upph)}</span>
-        <span><b>${esc(nafn)}</b><small>${esc(lysing)}</small><span class="fj">${fj(fjoldi, "myndband", "myndbönd")}</span></span>
+  function teiknaForsidu() {
+    const reitur = (k) => `
+      <button class="reitur" data-k="${esc(k.id)}" style="--litur:${k.litur}">
+        <span class="reit-takn">${takn(k.takn)}</span>
+        <b>${esc(k.fag || k.nafn)}</b>
+        ${k.fag ? `<span class="reit-nafn">${esc(k.nafn)}</span>` : ""}
+        <span class="fj">${fj(fjoldiKennara(k), "myndband", "myndbönd")}</span>
       </button>`;
-    $("#kennarar").innerHTML =
-      mappa("", "Allir kennarar", fj(kennarar.length, "kennari", "kennarar") + " í safninu", heild, "var(--blek)", "∑", "var(--blad)") +
-      kennarar.map((k) => mappa(k.id, k.nafn, k.lysing, k.listar.reduce((s, l) => s + l.myndbond.length, 0), k.litur, k.upph)).join("");
+    const vaent = (v) => `
+      <div class="reitur vaent" aria-disabled="true">
+        <span class="reit-takn">${takn(v.takn)}</span>
+        <b>${esc(v.fag)}</b>
+        ${v.nafn ? `<span class="reit-nafn">${esc(v.nafn)}</span>` : ""}
+        <span class="merki-vaent">Væntanlegt</span>
+      </div>`;
+    $("#svaedi").innerHTML = `<h1 class="forsida-h">Veldu efni</h1>
+      <div class="reitir">${kennarar.map(reitur).join("")}${vaentanlegt.map(vaent).join("")}</div>`;
+  }
+
+  function teiknaToppur() {
+    const k = st.k && kennarar.find((x) => x.id === st.k);
+    if (!k) { $("#toppur").innerHTML = ""; return; }
+    const n = fjoldiKennara(k);
+    const heild = k.listar.reduce((s, l) => s + l.myndbond.reduce((t, m) => t + m.sek, 0), 0);
+    $("#toppur").innerHTML = `
+      <div class="kennarahaus" style="--litur:${k.litur}">
+        <button class="hnappur" data-heim>‹ Forsíða</button>
+        <span class="reit-takn">${takn(k.takn)}</span>
+        <div class="kh-texti">
+          ${k.fag ? `<p class="yfir">${esc(k.fag)}</p>` : ""}
+          <h1>${esc(k.nafn)}</h1>
+          ${k.lysing ? `<p>${esc(k.lysing)}</p>` : ""}
+          <p class="mono">${fj(n, "myndband", "myndbönd")} · ${fj(k.listar.length, "listi", "listar")} · ${minutur(heild)}</p>
+        </div>
+      </div>`;
   }
 
   function teiknaFlokka() {
     const grunnur = siadMyndbond({ hunsaFlokk: true });
     const telja = (f) => grunnur.filter((m) => m.listi.flokkur === f).length;
     const til = FLOKKA_ROD.filter((f) => myndbond.some((m) => m.listi.flokkur === f && (!st.k || m.kennari.id === st.k)));
+    // Einn flokkur = ekkert að velja á milli
+    if (til.length < 2) { $("#flokkar").innerHTML = ""; return; }
     $("#flokkar").innerHTML =
       `<button class="flogi" data-f="" aria-pressed="${!st.f}">Allt efni <span>${grunnur.length}</span></button>` +
       til.map((f) => {
@@ -141,12 +180,12 @@
       }).join("");
   }
 
-  const spjaldMyndbands = (m, synaKennara) => `
+  const spjaldMyndbands = (m, synaKennara, synaLista = true) => `
     <button class="spjald" data-v="${esc(m.lykill)}" data-l="${esc(m.listi.lykill)}">
       <span class="smamynd"><img loading="lazy" src="${esc(smamynd(m))}" alt="">
         <span class="lengd">${timi(m.sek)}</span>${skodad.has(m.lykill) ? '<span class="merkt">✓ Skoðað</span>' : ""}</span>
       <span class="spjald-texti"><b>${esc(m.title)}</b>
-        <small>${esc(m.listi.titill)}</small>
+        ${synaLista ? `<small>${esc(m.listi.titill)}</small>` : ""}
         ${synaKennara ? `<small class="kenn" style="--litur:${m.kennari.litur}">${esc(m.kennari.nafn)}</small>` : ""}</span>
     </button>`;
 
@@ -165,7 +204,7 @@
     </button>`;
   };
 
-  function teiknaMoppur() {
+  function teiknaMyndbond() {
     const fleiri = !st.k && kennarar.length > 1;
     let html = "";
     // Nýlega skoðað
@@ -181,8 +220,15 @@
       const ls = listar.filter((l) => l.flokkur === f && (!st.k || l.kennari.id === st.k));
       if (!ls.length) continue;
       const n = ls.reduce((s, l) => s + l.myndbond.length, 0);
-      html += `<section class="hluti"><h2 class="hluti-h">${esc(FLOKKAR[f])} <small>${fj(ls.length, "listi", "listar")} · ${fj(n, "myndband", "myndbönd")}</small></h2>
-        <div class="net">${ls.map((l) => spjaldLista(l, fleiri)).join("")}</div></section>`;
+      html += `<section class="hluti"><h2 class="hluti-h">${esc(FLOKKAR[f])} <small>${fj(n, "myndband", "myndbönd")}</small></h2>
+        ${ls.map((l) => {
+          const naesta = l.myndbond.find((m) => !skodad.has(m.lykill)) || l.myndbond[0];
+          return `<div class="listi-hluti">
+            <h3 class="listi-h"><span>${esc(l.titill)}</span>
+              <small class="mono">${fj(l.myndbond.length, "myndband", "myndbönd")} · ${minutur(l.myndbond.reduce((s, m) => s + m.sek, 0))}</small>
+              ${l.myndbond.length > 1 ? `<button class="hnappur" data-v="${esc(naesta.lykill)}" data-l="${esc(l.lykill)}">▶ Spila listann</button>` : ""}</h3>
+            <div class="net">${l.myndbond.map((m) => spjaldMyndbands(m, fleiri, false)).join("")}</div></div>`;
+        }).join("")}</section>`;
     }
     $("#svaedi").innerHTML = html || tomt();
   }
@@ -212,7 +258,7 @@
     $("#svaedi").innerHTML = `
       <div class="listahaus">
         <div>
-          <button class="hnappur" data-til-baka>‹ Allir listar</button>
+          <button class="hnappur" data-til-baka>‹ Til baka</button>
         </div>
         <div style="flex:1 1 320px">
           <small class="kenn" style="--litur:${l.kennari.litur}">${esc(l.kennari.nafn)} · ${esc(FLOKKAR[l.flokkur])}</small>
@@ -254,8 +300,11 @@
 
   function teiknaTillogur() {
     const t = $("#tillogur");
-    if (st.l && !st.q) { t.innerHTML = ""; return; }
-    const ord = ["Ohm", "Díóður", "Þéttir", "Fasvik", "Transistor", "Mótor", "Segulliði", "Síur"];
+    if (aForsidu() || (st.l && !st.q)) { t.innerHTML = ""; return; }
+    // Tillögur fyrir fag kennarans, eða öll fög ef leitað er í öllu safninu
+    const fog = st.k ? kennarar.filter((k) => k.id === st.k).map((k) => k.fag) : Object.keys(TILLOGUR);
+    const ord = [...new Set(fog.flatMap((f) => TILLOGUR[f] || []))];
+    if (!ord.length) { t.innerHTML = ""; return; }
     const virk = norm(st.q.trim());
     t.innerHTML = `<span class="tl-h">Vinsælar leitir:</span>` + ord.map((o) => {
       const valin = norm(o) === virk;
@@ -314,12 +363,15 @@
   };
 
   /* ---------- aðalteikning ---------- */
+  // Forsíðan sýnir bara reitina; leit og síur birtast þegar kennari er valinn eða leitað er
+  const aForsidu = () => !st.k && !st.q && !st.l;
   function teiknaEfni() {
     const l = st.l && listiEftirLykli.get(st.l);
     const virkarSiur = st.q || st.len || st.rod || st.fela;
-    if (l && !st.q) teiknaLista(l);
+    if (aForsidu()) teiknaForsidu();
+    else if (l && !st.q) teiknaLista(l);
     else if (virkarSiur) teiknaNidurstodur();
-    else teiknaMoppur();
+    else teiknaMyndbond();
   }
   function teikna() {
     const leit = $("#leit");
@@ -328,7 +380,8 @@
     $("#lengd").value = st.len;
     $("#rod").value = st.rod;
     $("#oskodad").checked = !!st.fela;
-    teiknaKennara();
+    $(".siur").hidden = aForsidu();
+    teiknaToppur();
     teiknaFlokka();
     teiknaTillogur();
     if (st.v) opnaSpilara(); else { lokaSpilaraBeint(); teiknaEfni(); }
@@ -339,7 +392,7 @@
     const t = e.target.closest("button, a[data-heim]");
     if (!t) return;
     if (t.matches("[data-heim]")) { e.preventDefault(); fara({ ...TOM }); scrollTo({ top: 0 }); return; }
-    if (t.dataset.k !== undefined) return fara({ k: t.dataset.k, l: "", f: "" });
+    if (t.dataset.k !== undefined) { fara({ ...TOM, k: t.dataset.k }); scrollTo({ top: 0 }); return; }
     if (t.dataset.f !== undefined) return fara({ f: t.dataset.f, l: "" });
     if (t.dataset.listi) { fara({ l: t.dataset.listi, q: "" }); scrollTo({ top: 0 }); return; }
     if (t.dataset.v) return fara({ v: t.dataset.v, l: t.dataset.l || "" });

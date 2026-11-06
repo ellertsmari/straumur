@@ -45,6 +45,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
@@ -111,33 +112,42 @@ code, kbd, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
   color: var(--daufur); margin: 0 0 12px;
 }
 
-/* kennaramöppur */
-.moppur { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px 16px; margin-bottom: 24px; }
-.mappa {
-  position: relative; text-align: left; cursor: pointer;
-  background: var(--spjald); border: 1.5px solid var(--lina); border-radius: 4px 12px 12px 12px;
-  padding: 14px 16px 14px 18px; margin-top: 10px; box-shadow: var(--skuggi);
-  display: flex; gap: 12px; align-items: center;
+/* forsíða: reitir (íkonar) */
+.forsida-h { font-size: 1.6rem; letter-spacing: -.01em; margin: 8px 0 20px; }
+.reitir { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+.reitur {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; cursor: pointer;
+  padding: 26px 18px 22px; background: var(--spjald); border: 1.5px solid var(--lina); border-radius: 16px;
+  box-shadow: var(--skuggi); border-top: 5px solid var(--litur, var(--aherslu));
   transition: border-color .15s, transform .15s;
 }
-.mappa::before { /* flipi á möppu */
-  content: ""; position: absolute; left: -1.5px; top: -11px; width: 42%; height: 11px;
-  background: inherit; border: 1.5px solid var(--lina); border-bottom: 0; border-radius: 8px 10px 0 0;
+.reitur:hover { transform: translateY(-2px); border-color: var(--aherslu); border-top-color: var(--litur, var(--aherslu)); }
+.reitur b { font-size: 1.3rem; line-height: 1.2; margin-top: 8px; }
+.reit-nafn { color: var(--blek); font-size: .95rem; }
+.reitur .fj { font: .8rem "IBM Plex Mono", monospace; color: var(--daufur); }
+.reit-takn {
+  width: 76px; height: 76px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+  background: var(--litur, var(--aherslu)); color: #fff;
 }
-.mappa::after { /* vírlitur kennarans */
-  content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--litur, var(--aherslu));
+.reit-takn svg { width: 40px; height: 40px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.reitur.vaent { cursor: default; box-shadow: none; border-style: dashed; border-top: 5px solid var(--lina); background: transparent; color: var(--daufur); }
+.reitur.vaent:hover { transform: none; border-color: var(--lina); }
+.reitur.vaent .reit-takn { background: var(--lina); color: var(--daufur); }
+.merki-vaent { font: 600 .72rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .1em; padding: 2px 8px; border: 1px solid var(--lina); border-radius: 999px; }
+
+/* haus þegar kennari er valinn */
+.kennarahaus {
+  display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; padding: 18px 20px;
+  background: var(--spjald); border: 1.5px solid var(--lina); border-left: 5px solid var(--litur, var(--aherslu)); border-radius: 14px; box-shadow: var(--skuggi);
 }
-.mappa:hover { transform: translateY(-1px); border-color: var(--daufur); }
-.mappa[aria-pressed="true"] { border-color: var(--aherslu); background: var(--aherslu-bakg); }
-.mappa[aria-pressed="true"]::before { border-color: var(--aherslu); background: var(--aherslu-bakg); }
-.mappa .upph {
-  width: 42px; height: 42px; letter-spacing: .02em; border-radius: 50%; flex-shrink: 0;
-  display: grid; place-items: center; font-weight: 700; font-size: 1rem; line-height: 1;
-  background: var(--litur, var(--aherslu)); color: var(--upph-texti, #fff);
-}
-.mappa b { display: block; font-weight: 600; line-height: 1.25; }
-.mappa small { display: block; color: var(--daufur); font-size: .82rem; }
-.mappa .fj { font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: var(--daufur); }
+.kennarahaus > .hnappur { align-self: flex-start; }
+.kennarahaus .reit-takn { width: 56px; height: 56px; }
+.kennarahaus .reit-takn svg { width: 30px; height: 30px; }
+.kh-texti { flex: 1 1 260px; }
+.kh-texti .yfir { margin: 0 0 4px; }
+.kh-texti h1 { margin: 0 0 4px; font-size: 1.5rem; line-height: 1.2; }
+.kh-texti p { margin: 0; color: var(--daufur); }
+.kh-texti .mono { font-size: .85rem; margin-top: 4px; }
 
 /* síur */
 .siur { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
@@ -196,6 +206,11 @@ code, kbd, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
 .hluti-h::after { content: ""; flex: 1; border-bottom: 1.5px dashed var(--lina); translate: 0 -4px; }
 .hluti-h small { font: 500 .78rem "IBM Plex Mono", monospace; color: var(--daufur); order: 2; }
 .hluti-h::after { order: 1; }
+
+.listi-hluti { margin-bottom: 26px; }
+.listi-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 10px; font-size: 1rem; }
+.listi-h small { color: var(--daufur); font-size: .78rem; font-weight: 500; }
+.listi-h .hnappur { margin-left: auto; padding: 4px 12px; font-size: .82rem; }
 
 .net { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
 
@@ -308,16 +323,21 @@ dialog#spilari::backdrop { background: rgba(8, 14, 26, .7); backdrop-filter: blu
   .merki small { display: none; }
   .leit { max-width: none; flex-basis: 100%; }
   .leit kbd { display: none; }
-  /* möppur og flokkar í láréttri röð svo efnið sjáist strax */
-  .moppur, .flogar {
+  /* flokkar í láréttri röð svo efnið sjáist strax */
+  .flogar {
     display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
     margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px;
   }
-  .moppur::-webkit-scrollbar, .flogar::-webkit-scrollbar { display: none; }
-  .moppur { gap: 10px; margin-bottom: 16px; padding-block: 2px 4px; }
-  .mappa { flex: 0 0 auto; max-width: 78vw; padding: 10px 14px 10px 14px; gap: 10px; }
-  .mappa .upph { width: 34px; height: 34px; font-size: .82rem; }
-  .mappa small:not(.fj) { display: none; }
+  .flogar::-webkit-scrollbar { display: none; }
+  .reitir { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .reitur { padding: 18px 10px 16px; }
+  .reitur b { font-size: 1.1rem; }
+  .reit-nafn { font-size: .85rem; }
+  .reit-takn { width: 60px; height: 60px; }
+  .reit-takn svg { width: 32px; height: 32px; }
+  .forsida-h { font-size: 1.35rem; margin: 4px 0 14px; }
+  .kennarahaus { padding: 14px; gap: 12px; }
+  .kennarahaus > .hnappur { flex-basis: 100%; justify-content: center; }
   .flogi { flex: 0 0 auto; }
   .hluti-h { flex-wrap: wrap; row-gap: 2px; }
   .hluti-h::after { display: none; }
